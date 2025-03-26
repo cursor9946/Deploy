@@ -1,12 +1,20 @@
- # Build stage
-FROM maven:3.8.4-openjdk-17 as build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
+# Use a lightweight JDK image
+FROM eclipse-temurin:17-jdk
 
-# Run stage
-FROM openjdk:17-slim
+# Set the working directory
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+
+# Copy only the Backend folder (which contains pom.xml and src/)
+COPY Backend /app
+
+# Move into the correct directory
+WORKDIR /app
+
+# Build the Spring Boot project
+RUN mvn clean install  -DskipTests -Ddependency-check.skip=true
+
+# Expose port 8080
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Run the application
+CMD ["java", "-jar", "target/*.jar"]
