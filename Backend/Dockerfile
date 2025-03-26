@@ -1,20 +1,12 @@
-# Use a lightweight JDK image
-FROM eclipse-temurin:17-jdk
-
-# Set the working directory
+# Build stage
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
-
-# Copy only the Backend folder (which contains pom.xml and src/)
 COPY Backend /app
-
-# Move into the correct directory
-WORKDIR /app
-
-# Build the Spring Boot project
 RUN mvn clean package -DskipTests
 
-# Expose port 8080
+# Run stage
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY --from=build /app/target/my-spring-project-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-
-# Run the application
-CMD ["java", "-jar", "/app/target/my-spring-project-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "app.jar"]
