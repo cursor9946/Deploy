@@ -11,7 +11,7 @@ COPY Backend /app
 WORKDIR /app
 
 # Build the Spring Boot project
-RUN ./mvnw clean package -DskipTests -Ddependency-check.skip=true
+RUN mvn clean package -DskipTests
 
 # Expose port 8080
 EXPOSE 8080
